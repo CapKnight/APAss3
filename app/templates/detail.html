@@ -17,5 +17,13 @@
         <p><strong>First Appearance:</strong> {{ character['FIRST APPEARANCE']|default('N/A') }}</p>
         <p><strong>Year:</strong> {{ character.YEAR|default('N/A') }}</p>
     </div>
+    <label>
+        <input type="checkbox" class="character-select" data-id="{{ character.page_id }}" data-toggle-url="{{ url_for('character.toggle_selection', id=0) }}" {% if character.page_id in selected_ids %}checked{% endif %}>
+        Add to Compare
+    </label>
     <a href="{{ url_for('character.index') }}">Back to list</a>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="{{ url_for('static', filename='js/selection.js') }}"></script>
 {% endblock %}
