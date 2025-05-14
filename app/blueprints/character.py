@@ -12,7 +12,6 @@ def index():
     
     selected_ids = session.get('selected_ids', [])
     
-    # 使用数据库分页
     basic_query = BasicInfo.query.offset(start).limit(per_page).all()
     total_count = BasicInfo.query.count()
     total_pages = (total_count + per_page - 1) // per_page
@@ -72,7 +71,7 @@ def character_detail(id):
 def compare():
     selected_ids = session.get('selected_ids', [])
     if not selected_ids:
-        return "No characters selected. <a href='" + url_for('character.index') + "'>Back to Home</a>", 400
+        return render_template('compare.html', characters=[], message="No characters selected."), 400
     
     selected_ids = [int(id) for id in selected_ids]
     
