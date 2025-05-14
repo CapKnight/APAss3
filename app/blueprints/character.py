@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify
-from app.data import basic_info, appearance, other_info, url_info
+from app.models import BasicInfo, Appearance, OtherInfo, UrlInfo
 from app.config import Config
 
 character_bp = Blueprint('character', __name__)
@@ -9,32 +9,61 @@ def index():
     per_page = Config.PER_PAGE
     page = request.args.get('page', 1, type=int)
     start = (page - 1) * per_page
-    end = start + per_page
     
     selected_ids = session.get('selected_ids', [])
     
-    paginated_basic = basic_info.iloc[start:end]
-    merged_data = paginated_basic.merge(appearance, on='page_id', how='left') \
-                                .merge(other_info, on='page_id', how='left') \
-                                .merge(url_info, on='page_id', how='left')
+    # 使用数据库分页
+    basic_query = BasicInfo.query.offset(start).limit(per_page).all()
+    total_count = BasicInfo.query.count()
+    total_pages = (total_count + per_page - 1) // per_page
     
-    total_pages = (len(basic_info) + per_page - 1) // per_page
-    return render_template('index.html', characters=merged_data.to_dict(orient='records'), page=page, total_pages=total_pages, selected_ids=selected_ids)
+    characters = []
+    for basic in basic_query:
+        appearance = Appearance.query.filter_by(page_id=basic.page_id).first()
+        other = OtherInfo.query.filter_by(page_id=basic.page_id).first()
+        url = UrlInfo.query.filter_by(page_id=basic.page_id).first()
+        char = {
+            'page_id': basic.page_id,
+            'name': basic.name,
+            'ID': basic.ID,
+            'ALIGN': basic.ALIGN,
+            'SEX': basic.SEX,
+            'ALIVE': basic.ALIVE,
+            'YEAR': basic.YEAR,
+            'EYE': appearance.EYE if appearance else 'Unknown',
+            'HAIR': appearance.HAIR if appearance else 'Unknown',
+            'GSM': other.GSM if other else 'Unknown',
+            'APPEARANCES': other.APPEARANCES if other else 'N/A',
+            'FIRST APPEARANCE': other.FIRST_APPEARANCE if other else 'N/A',
+            'urlslug': url.urlslug if url else 'N/A'
+        }
+        characters.append(char)
+    
+    return render_template('index.html', characters=characters, page=page, total_pages=total_pages, selected_ids=selected_ids)
 
 @character_bp.route('/character/<int:id>')
 def character_detail(id):
-    character_basic = basic_info[basic_info['page_id'] == id]
-    if character_basic.empty:
-        return render_template('404.html'), 404
+    character_basic = BasicInfo.query.get_or_404(id)
     
-    character_appearance = appearance[appearance['page_id'] == id]
-    character_other = other_info[other_info['page_id'] == id]
-    character_url = url_info[url_info['page_id'] == id]
+    character_appearance = Appearance.query.filter_by(page_id=id).first()
+    character_other = OtherInfo.query.filter_by(page_id=id).first()
+    character_url = UrlInfo.query.filter_by(page_id=id).first()
     
-    character = character_basic.iloc[0].to_dict()
-    character.update(character_appearance.iloc[0].to_dict() if not character_appearance.empty else {})
-    character.update(character_other.iloc[0].to_dict() if not character_other.empty else {})
-    character.update(character_url.iloc[0].to_dict() if not character_url.empty else {})
+    character = {
+        'page_id': character_basic.page_id,
+        'name': character_basic.name,
+        'ID': character_basic.ID,
+        'ALIGN': character_basic.ALIGN,
+        'SEX': character_basic.SEX,
+        'ALIVE': character_basic.ALIVE,
+        'YEAR': character_basic.YEAR,
+        'EYE': character_appearance.EYE if character_appearance else 'Unknown',
+        'HAIR': character_appearance.HAIR if character_appearance else 'Unknown',
+        'GSM': character_other.GSM if character_other else 'Unknown',
+        'APPEARANCES': character_other.APPEARANCES if character_other else 'N/A',
+        'FIRST APPEARANCE': character_other.FIRST_APPEARANCE if character_other else 'N/A',
+        'urlslug': character_url.urlslug if character_url else 'N/A'
+    }
     
     selected_ids = session.get('selected_ids', [])
     return render_template('detail.html', character=character, selected_ids=selected_ids)
@@ -47,21 +76,29 @@ def compare():
     
     selected_ids = [int(id) for id in selected_ids]
     
-    selected_basic = basic_info[basic_info['page_id'].isin(selected_ids)]
-    selected_appearance = appearance[appearance['page_id'].isin(selected_ids)]
-    selected_other = other_info[other_info['page_id'].isin(selected_ids)]
-    selected_url = url_info[url_info['page_id'].isin(selected_ids)]
-    
     characters = []
     for idx in selected_ids:
-        char_basic = selected_basic[selected_basic['page_id'] == idx].iloc[0].to_dict()
-        char_appearance = selected_appearance[selected_appearance['page_id'] == idx].iloc[0].to_dict() if not selected_appearance.empty else {}
-        char_other = selected_other[selected_other['page_id'] == idx].iloc[0].to_dict() if not selected_other.empty else {}
-        char_url = selected_url[selected_url['page_id'] == idx].iloc[0].to_dict() if not selected_url.empty else {}
-        char = char_basic.copy()
-        char.update(char_appearance)
-        char.update(char_other)
-        char.update(char_url)
+        char_basic = BasicInfo.query.get(idx)
+        if not char_basic:
+            continue
+        char_appearance = Appearance.query.filter_by(page_id=idx).first()
+        char_other = OtherInfo.query.filter_by(page_id=idx).first()
+        char_url = UrlInfo.query.filter_by(page_id=idx).first()
+        char = {
+            'page_id': char_basic.page_id,
+            'name': char_basic.name,
+            'ID': char_basic.ID,
+            'ALIGN': char_basic.ALIGN,
+            'SEX': char_basic.SEX,
+            'ALIVE': char_basic.ALIVE,
+            'YEAR': char_basic.YEAR,
+            'EYE': char_appearance.EYE if char_appearance else 'Unknown',
+            'HAIR': char_appearance.HAIR if char_appearance else 'Unknown',
+            'GSM': char_other.GSM if char_other else 'Unknown',
+            'APPEARANCES': char_other.APPEARANCES if char_other else 'N/A',
+            'FIRST APPEARANCE': char_other.FIRST_APPEARANCE if char_other else 'N/A',
+            'urlslug': char_url.urlslug if char_url else 'N/A'
+        }
         characters.append(char)
     
     return render_template('compare.html', characters=characters)
