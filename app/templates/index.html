@@ -12,6 +12,11 @@
                 <th>Alignment</th>
                 <th>Sex</th>
                 <th>Alive</th>
+                <th>Year</th>
+                <th>Eye Color</th>
+                <th>Hair Color</th>
+                <th>GSM</th>
+                <th>Appearances</th>
                 <th>First Appearance</th>
             </tr>
         </thead>
@@ -23,6 +28,11 @@
                     <td>{{ character.ALIGN|default('Unknown') }}</td>
                     <td>{{ character.SEX|default('Unknown') }}</td>
                     <td>{{ character.ALIVE|default('Unknown') }}</td>
+                    <td>{{ character.YEAR|default('N/A') }}</td>
+                    <td>{{ character.EYE|default('Unknown') }}</td>
+                    <td>{{ character.HAIR|default('Unknown') }}</td>
+                    <td>{{ character.GSM|default('Unknown') }}</td>
+                    <td>{{ character.APPEARANCES|default('N/A') }}</td>
                     <td>{{ character['FIRST APPEARANCE']|default('N/A') }}</td>
                 </tr>
             {% endfor %}

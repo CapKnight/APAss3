@@ -5,6 +5,7 @@
 {% block content %}
     <h1>{{ character.name|default('Unknown') }}</h1>
     <div class="character-details">
+        <p><strong>Name:</strong> {{ character.name|default('Unknown') }}</p>
         <p><strong>ID:</strong> {{ character.ID|default('N/A') }}</p>
         <p><strong>Alignment:</strong> {{ character.ALIGN|default('Unknown') }}</p>
         <p><strong>Eye Color:</strong> {{ character.EYE|default('Unknown') }}</p>
