@@ -4,6 +4,71 @@
 
 {% block content %}
     <h2>DC Characters List</h2>
+    
+    <!-- 搜索和筛选表单 -->
+    <form method="get" action="{{ url_for('character.index') }}">
+        <div>
+            <label for="search_name">Search by Name:</label>
+            <input type="text" id="search_name" name="search_name" value="{{ search_name }}">
+        </div>
+        <div>
+            <label for="filter_id">Filter by ID:</label>
+            <select id="filter_id" name="filter_id">
+                <option value="All" {% if filter_id == 'All' or not filter_id %}selected{% endif %}>All</option>
+                {% for id in id_values %}
+                    <option value="{{ id }}" {% if filter_id == id %}selected{% endif %}>{{ id }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="filter_align">Filter by Alignment:</label>
+            <select id="filter_align" name="filter_align">
+                <option value="All" {% if filter_align == 'All' or not filter_align %}selected{% endif %}>All</option>
+                {% for align in align_values %}
+                    <option value="{{ align }}" {% if filter_align == align %}selected{% endif %}>{{ align }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="filter_eye">Filter by Eye Color:</label>
+            <select id="filter_eye" name="filter_eye">
+                <option value="All" {% if filter_eye == 'All' or not filter_eye %}selected{% endif %}>All</option>
+                {% for eye in eye_values %}
+                    <option value="{{ eye }}" {% if filter_eye == eye %}selected{% endif %}>{{ eye }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="filter_hair">Filter by Hair Color:</label>
+            <select id="filter_hair" name="filter_hair">
+                <option value="All" {% if filter_hair == 'All' or not filter_hair %}selected{% endif %}>All</option>
+                {% for hair in hair_values %}
+                    <option value="{{ hair }}" {% if filter_hair == hair %}selected{% endif %}>{{ hair }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="filter_sex">Filter by Sex:</label>
+            <select id="filter_sex" name="filter_sex">
+                <option value="All" {% if filter_sex == 'All' or not filter_sex %}selected{% endif %}>All</option>
+                {% for sex in sex_values %}
+                    <option value="{{ sex }}" {% if filter_sex == sex %}selected{% endif %}>{{ sex }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="filter_alive">Filter by Alive:</label>
+            <select id="filter_alive" name="filter_alive">
+                <option value="All" {% if filter_alive == 'All' or not filter_alive %}selected{% endif %}>All</option>
+                {% for alive in alive_values %}
+                    <option value="{{ alive }}" {% if filter_alive == alive %}selected{% endif %}>{{ alive }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit">Apply Filters</button>
+        <button type="button" onclick="this.form.reset(); this.form.submit();">Clear Filters</button>
+    </form>
+
     <table>
         <thead>
             <tr>
@@ -43,19 +108,19 @@
 
     <div class="pagination">
         {% if page > 1 %}
-            <a href="{{ url_for('character.index', page=page-1) }}">Previous</a>
+            <a href="{{ url_for('character.index', page=page-1, search_name=search_name, filter_id=filter_id, filter_align=filter_align, filter_eye=filter_eye, filter_hair=filter_hair, filter_sex=filter_sex, filter_alive=filter_alive) }}">Previous</a>
         {% endif %}
 
         {% for p in range(1, total_pages + 1) %}
             {% if p == page %}
                 <span class="current">{{ p }}</span>
             {% else %}
-                <a href="{{ url_for('character.index', page=p) }}">{{ p }}</a>
+                <a href="{{ url_for('character.index', page=p, search_name=search_name, filter_id=filter_id, filter_align=filter_align, filter_eye=filter_eye, filter_hair=filter_hair, filter_sex=filter_sex, filter_alive=filter_alive) }}">{{ p }}</a>
             {% endif %}
         {% endfor %}
 
         {% if page < total_pages %}
-            <a href="{{ url_for('character.index', page=page+1) }}">Next</a>
+            <a href="{{ url_for('character.index', page=page+1, search_name=search_name, filter_id=filter_id, filter_align=filter_align, filter_eye=filter_eye, filter_hair=filter_hair, filter_sex=filter_sex, filter_alive=filter_alive) }}">Next</a>
         {% endif %}
     </div>
 {% endblock %}

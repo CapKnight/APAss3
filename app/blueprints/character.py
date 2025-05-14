@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify
 from app.models import BasicInfo, Appearance, OtherInfo, UrlInfo
 from app.config import Config
+from sqlalchemy import distinct
 
 character_bp = Blueprint('character', __name__)
 
@@ -10,10 +11,45 @@ def index():
     page = request.args.get('page', 1, type=int)
     start = (page - 1) * per_page
     
+    # 获取搜索和筛选参数
+    search_name = request.args.get('search_name', '')
+    filter_id = request.args.get('filter_id', '')
+    filter_align = request.args.get('filter_align', '')
+    filter_eye = request.args.get('filter_eye', '')
+    filter_hair = request.args.get('filter_hair', '')
+    filter_sex = request.args.get('filter_sex', '')
+    filter_alive = request.args.get('filter_alive', '')
+    
     selected_ids = session.get('selected_ids', [])
     
-    basic_query = BasicInfo.query.offset(start).limit(per_page).all()
-    total_count = BasicInfo.query.count()
+    # 获取筛选字段的唯一值（去重）
+    id_values = [id[0] for id in BasicInfo.query.with_entities(distinct(BasicInfo.ID)).all() if id[0] and id[0] != 'N/A']
+    align_values = [align[0] for align in BasicInfo.query.with_entities(distinct(BasicInfo.ALIGN)).all() if align[0] and align[0] != 'Unknown']
+    eye_values = [eye[0] for eye in Appearance.query.with_entities(distinct(Appearance.EYE)).all() if eye[0] and eye[0] != 'Unknown']
+    hair_values = [hair[0] for hair in Appearance.query.with_entities(distinct(Appearance.HAIR)).all() if hair[0] and hair[0] != 'Unknown']
+    sex_values = [sex[0] for sex in BasicInfo.query.with_entities(distinct(BasicInfo.SEX)).all() if sex[0] and sex[0] != 'Unknown']
+    alive_values = [alive[0] for alive in BasicInfo.query.with_entities(distinct(BasicInfo.ALIVE)).all() if alive[0] and alive[0] != 'Unknown']
+    
+    # 构建查询
+    query = BasicInfo.query
+    if search_name:
+        query = query.filter(BasicInfo.name.ilike(f'%{search_name}%'))
+    if filter_id and filter_id != 'All':
+        query = query.filter(BasicInfo.ID == filter_id)
+    if filter_align and filter_align != 'All':
+        query = query.filter(BasicInfo.ALIGN == filter_align)
+    if filter_eye and filter_eye != 'All':
+        query = query.join(Appearance).filter(Appearance.EYE == filter_eye)
+    if filter_hair and filter_hair != 'All':
+        query = query.join(Appearance).filter(Appearance.HAIR == filter_hair)
+    if filter_sex and filter_sex != 'All':
+        query = query.filter(BasicInfo.SEX == filter_sex)
+    if filter_alive and filter_alive != 'All':
+        query = query.filter(BasicInfo.ALIVE == filter_alive)
+    
+    # 应用分页
+    total_count = query.count()
+    basic_query = query.offset(start).limit(per_page).all()
     total_pages = (total_count + per_page - 1) // per_page
     
     characters = []
@@ -38,7 +74,11 @@ def index():
         }
         characters.append(char)
     
-    return render_template('index.html', characters=characters, page=page, total_pages=total_pages, selected_ids=selected_ids)
+    return render_template('index.html', characters=characters, page=page, total_pages=total_pages, selected_ids=selected_ids,
+                          search_name=search_name, filter_id=filter_id, filter_align=filter_align, filter_eye=filter_eye,
+                          filter_hair=filter_hair, filter_sex=filter_sex, filter_alive=filter_alive,
+                          id_values=id_values, align_values=align_values, eye_values=eye_values,
+                          hair_values=hair_values, sex_values=sex_values, alive_values=alive_values)
 
 @character_bp.route('/character/<int:id>')
 def character_detail(id):
