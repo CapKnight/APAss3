@@ -1,13 +1,12 @@
 import pandas as pd
 import os
+from app import db
+from app.models import BasicInfo, Appearance, OtherInfo, UrlInfo
 
-def load_linked_tables():
+def migrate_data_to_db():
     try:
-        # 获取 dc_data.csv 路径
         data_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'dc_data.csv')
-        # 读取整个 CSV 文件
         df = pd.read_csv(data_path)
-        # 处理空值
         df = df.fillna({
             'page_id': 'N/A',
             'name': 'Unknown',
@@ -23,17 +22,52 @@ def load_linked_tables():
             'FIRST APPEARANCE': 'N/A',
             'YEAR': 'N/A'
         })
-        # 创建关联表
-        basic_info = df[['page_id', 'name', 'ID', 'ALIGN', 'SEX', 'ALIVE', 'YEAR']].copy()
-        appearance = df[['page_id', 'EYE', 'HAIR']].copy()
-        other_info = df[['page_id', 'GSM', 'APPEARANCES', 'FIRST APPEARANCE']].copy()
-        url_info = df[['page_id', 'urlslug']].copy()
-        
-        print(f"Loaded {len(df)} characters into linked tables")
-        return basic_info, appearance, other_info, url_info
-    except FileNotFoundError:
-        print("Error: dc_data.csv not found.")
-        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
 
-# 加载数据（供其他模块使用）
-basic_info, appearance, other_info, url_info = load_linked_tables()
+        for _, row in df.iterrows():
+            basic = BasicInfo(
+                page_id=row['page_id'],
+                name=row['name'],
+                ID=row['ID'],
+                ALIGN=row['ALIGN'],
+                SEX=row['SEX'],
+                ALIVE=row['ALIVE'],
+                YEAR=row['YEAR']
+            )
+            db.session.add(basic)
+
+            # 插入 Appearance
+            appearance = Appearance(
+                page_id=row['page_id'],
+                EYE=row['EYE'],
+                HAIR=row['HAIR']
+            )
+            db.session.add(appearance)
+
+            # 插入 OtherInfo
+            other = OtherInfo(
+                page_id=row['page_id'],
+                GSM=row['GSM'],
+                APPEARANCES=row['APPEARANCES'],
+                FIRST_APPEARANCE=row['FIRST APPEARANCE']
+            )
+            db.session.add(other)
+
+            # 插入 UrlInfo
+            url = UrlInfo(
+                page_id=row['page_id'],
+                urlslug=row['urlslug']
+            )
+            db.session.add(url)
+
+        db.session.commit()
+        print(f"Migrated {len(df)} characters to database")
+    except Exception as e:
+        print(f"Error migrating data: {e}")
+        db.session.rollback()
+
+if __name__ == "__main__":
+    from app import app
+    with app.app_context():
+        db.drop_all()  # 删除现有表（可选，仅用于测试）
+        db.create_all()  # 重新创建表
+        migrate_data_to_db()
