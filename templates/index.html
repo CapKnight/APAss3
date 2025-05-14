@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DC Characters</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h1>DC Characters</h1>
+    <ul>
+        {% for character in characters %}
+            <li><a href="/character/{{ character.page_id }}">{{ character.name }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ character.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h1>{{ character.name }}</h1>
+    <p><strong>Gender:</strong> {{ character.SEX }}</p>
+    <p><strong>First Appearance:</strong> {{ character['FIRST APPEARANCE'] }}</p>
+    <p><strong>Eye Color:</strong> {{ character['EYE'] }}</p>
+    <p><strong>Hair Color:</strong> {{ character['HAIR'] }}</p>
+    <!-- 根据需要添加更多字段 -->
+    <a href="/">Back to list</a>
+</body>
+</html>
