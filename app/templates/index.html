@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <h2>DC Characters List</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>ID</th>
+                <th>Alignment</th>
+                <th>Sex</th>
+                <th>Alive</th>
+                <th>First Appearance</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for character in characters %}
+                <tr>
+                    <td><a href="{{ url_for('character.character_detail', id=character.page_id) }}">{{ character.name|default('Unknown') }}</a></td>
+                    <td>{{ character.ID|default('N/A') }}</td>
+                    <td>{{ character.ALIGN|default('Unknown') }}</td>
+                    <td>{{ character.SEX|default('Unknown') }}</td>
+                    <td>{{ character.ALIVE|default('Unknown') }}</td>
+                    <td>{{ character['FIRST APPEARANCE']|default('N/A') }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        {% if page > 1 %}
+            <a href="{{ url_for('character.index', page=page-1) }}">Previous</a>
+        {% endif %}
+
+        {% for p in range(1, total_pages + 1) %}
+            {% if p == page %}
+                <span class="current">{{ p }}</span>
+            {% else %}
+                <a href="{{ url_for('character.index', page=p) }}">{{ p }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page < total_pages %}
+            <a href="{{ url_for('character.index', page=page+1) }}">Next</a>
+        {% endif %}
+    </div>
+{% endblock %}

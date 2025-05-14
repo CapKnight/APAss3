@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}{{ character.name|default('Unknown') }}{% endblock %}
+
+{% block content %}
+    <h1>{{ character.name|default('Unknown') }}</h1>
+    <div class="character-details">
+        <p><strong>ID:</strong> {{ character.ID|default('N/A') }}</p>
+        <p><strong>Alignment:</strong> {{ character.ALIGN|default('Unknown') }}</p>
+        <p><strong>Eye Color:</strong> {{ character.EYE|default('Unknown') }}</p>
+        <p><strong>Hair Color:</strong> {{ character.HAIR|default('Unknown') }}</p>
+        <p><strong>Sex:</strong> {{ character.SEX|default('Unknown') }}</p>
+        <p><strong>GSM:</strong> {{ character.GSM|default('Unknown') }}</p>
+        <p><strong>Alive:</strong> {{ character.ALIVE|default('Unknown') }}</p>
+        <p><strong>Appearances:</strong> {{ character.APPEARANCES|default('N/A') }}</p>
+        <p><strong>First Appearance:</strong> {{ character['FIRST APPEARANCE']|default('N/A') }}</p>
+        <p><strong>Year:</strong> {{ character.YEAR|default('N/A') }}</p>
+    </div>
+    <a href="{{ url_for('character.index') }}">Back to list</a>
+{% endblock %}

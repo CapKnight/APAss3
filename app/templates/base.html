@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DC Characters{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="{{ url_for('character.index') }}">DC Characters</a>
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('character.index') }}">Home</a>
+                <a href="{{ url_for('character.character_detail', id=1) }}">Characters</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>© 2025 DC Characters App. All rights reserved.</p>
+        <p>Contact us at: <a href="mailto:support@dccharacters.com">support@dccharacters.com</a></p>
+    </footer>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
