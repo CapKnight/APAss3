@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Compare Characters{% endblock %}
+
+{% block content %}
+    <h2>Compare Characters</h2>
+    {% if characters %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Action</th>
+                    <th>Name</th>
+                    <th>ID</th>
+                    <th>Alignment</th>
+                    <th>Eye Color</th>
+                    <th>Hair Color</th>
+                    <th>Sex</th>
+                    <th>GSM</th>
+                    <th>Alive</th>
+                    <th>Appearances</th>
+                    <th>First Appearance</th>
+                    <th>Year</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for character in characters %}
+                    <tr>
+                        <td><a href="{{ url_for('character.remove_from_compare', id=character.page_id) }}">Remove</a></td>
+                        <td>{{ character.name|default('Unknown') }}</td>
+                        <td>{{ character.ID|default('N/A') }}</td>
+                        <td>{{ character.ALIGN|default('Unknown') }}</td>
+                        <td>{{ character.EYE|default('Unknown') }}</td>
+                        <td>{{ character.HAIR|default('Unknown') }}</td>
+                        <td>{{ character.SEX|default('Unknown') }}</td>
+                        <td>{{ character.GSM|default('Unknown') }}</td>
+                        <td>{{ character.ALIVE|default('Unknown') }}</td>
+                        <td>{{ character.APPEARANCES|default('N/A') }}</td>
+                        <td>{{ character['FIRST APPEARANCE']|default('N/A') }}</td>
+                        <td>{{ character.YEAR|default('N/A') }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No characters selected for comparison.</p>
+    {% endif %}
+    <a href="{{ url_for('character.index') }}">Back to Home</a>
+{% endblock %}

@@ -7,6 +7,7 @@
     <table>
         <thead>
             <tr>
+                <th>Select</th>
                 <th>Name</th>
                 <th>ID</th>
                 <th>Alignment</th>
@@ -23,6 +24,7 @@
         <tbody>
             {% for character in characters %}
                 <tr>
+                    <td><input type="checkbox" class="character-select" data-id="{{ character.page_id }}" data-toggle-url="{{ url_for('character.toggle_selection', id=0) }}" {% if character.page_id in selected_ids %}checked{% endif %}></td>
                     <td><a href="{{ url_for('character.character_detail', id=character.page_id) }}">{{ character.name|default('Unknown') }}</a></td>
                     <td>{{ character.ID|default('N/A') }}</td>
                     <td>{{ character.ALIGN|default('Unknown') }}</td>
@@ -56,4 +58,8 @@
             <a href="{{ url_for('character.index', page=page+1) }}">Next</a>
         {% endif %}
     </div>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="{{ url_for('static', filename='js/selection.js') }}"></script>
 {% endblock %}
