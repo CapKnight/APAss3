@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify
 from app.models import BasicInfo, Appearance, OtherInfo, UrlInfo
 from app.config import Config
-from sqlalchemy import distinct
+from sqlalchemy import distinct, asc, desc, func, cast, Integer
 
 character_bp = Blueprint('character', __name__)
 
@@ -11,7 +11,7 @@ def index():
     page = request.args.get('page', 1, type=int)
     start = (page - 1) * per_page
     
-    # 获取搜索和筛选参数
+    # 获取搜索、筛选和排序参数
     search_name = request.args.get('search_name', '')
     filter_id = request.args.get('filter_id', '')
     filter_align = request.args.get('filter_align', '')
@@ -19,10 +19,11 @@ def index():
     filter_hair = request.args.get('filter_hair', '')
     filter_sex = request.args.get('filter_sex', '')
     filter_alive = request.args.get('filter_alive', '')
+    sort_appearances = request.args.get('sort_appearances', 'asc')  # 只保留 APPEARANCES 排序
     
     selected_ids = session.get('selected_ids', [])
     
-    # 获取筛选字段的唯一值（去重）
+    # 获取筛选字段的唯一值
     id_values = [id[0] for id in BasicInfo.query.with_entities(distinct(BasicInfo.ID)).all() if id[0] and id[0] != 'N/A']
     align_values = [align[0] for align in BasicInfo.query.with_entities(distinct(BasicInfo.ALIGN)).all() if align[0] and align[0] != 'Unknown']
     eye_values = [eye[0] for eye in Appearance.query.with_entities(distinct(Appearance.EYE)).all() if eye[0] and eye[0] != 'Unknown']
@@ -46,6 +47,15 @@ def index():
         query = query.filter(BasicInfo.SEX == filter_sex)
     if filter_alive and filter_alive != 'All':
         query = query.filter(BasicInfo.ALIVE == filter_alive)
+    
+    # 加入 OtherInfo 表以访问 APPEARANCES
+    query = query.join(OtherInfo, BasicInfo.page_id == OtherInfo.page_id)
+    
+    # 按 APPEARANCES 排序（将字符串转换为整数）
+    sort_func_appearances = asc if sort_appearances == 'asc' else desc
+    query = query.order_by(sort_func_appearances(
+        func.cast(func.coalesce(OtherInfo.APPEARANCES, '0'), Integer)
+    ))
     
     # 应用分页
     total_count = query.count()
@@ -78,7 +88,8 @@ def index():
                           search_name=search_name, filter_id=filter_id, filter_align=filter_align, filter_eye=filter_eye,
                           filter_hair=filter_hair, filter_sex=filter_sex, filter_alive=filter_alive,
                           id_values=id_values, align_values=align_values, eye_values=eye_values,
-                          hair_values=hair_values, sex_values=sex_values, alive_values=alive_values)
+                          hair_values=hair_values, sex_values=sex_values, alive_values=alive_values,
+                          sort_appearances=sort_appearances)
 
 @character_bp.route('/character/<int:id>')
 def character_detail(id):
