@@ -73,9 +73,7 @@
             </select>
         </div>
         <button type="submit">Apply Filters</button>
-        <form method="get" action="{{ url_for('character.clear_filters') }}">
-            <button type="submit" class="clear-btn">Clear Filters</button>
-        </form>
+        <a href="{{ url_for('character.clear_filters') }}" class="clear-btn">Clear Filters</a>
     </form>
 
     <table>

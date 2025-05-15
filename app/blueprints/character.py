@@ -11,8 +11,7 @@ def index():
     per_page = Config.PER_PAGE
     page = request.args.get('page', 1, type=int)
     start = (page - 1) * per_page
-    
-    # 获取搜索、筛选和排序参数
+
     search_name = request.args.get('search_name', '')
     filter_id = request.args.get('filter_id', '')
     filter_align = request.args.get('filter_align', '')
@@ -169,9 +168,16 @@ def remove_from_compare(id):
 
 @character_bp.route('/clear_filters')
 def clear_filters():
-    # 清空筛选相关的会话数据（如果有）
-    # 直接重定向到根路径，移除所有查询参数
-    return redirect(url_for('character.index'))
+    return redirect(url_for('character.index', 
+                            page=1, 
+                            search_name='', 
+                            filter_id='All', 
+                            filter_align='All', 
+                            filter_eye='All', 
+                            filter_hair='All', 
+                            filter_sex='All', 
+                            filter_alive='All', 
+                            sort_appearances='asc'))
 
 @character_bp.route('/toggle_selection/<int:id>', methods=['POST'])
 def toggle_selection(id):
