@@ -73,7 +73,9 @@
             </select>
         </div>
         <button type="submit">Apply Filters</button>
-        <button type="button" onclick="this.form.reset(); window.location.href='{{ url_for('character.index') }}';">Clear Filters</button>
+        <form method="get" action="{{ url_for('character.clear_filters') }}">
+            <button type="submit">Clear Filters</button>
+        </form>
     </form>
 
     <table>
@@ -96,7 +98,21 @@
         <tbody>
             {% for character in characters %}
                 <tr>
-                    <td><input type="checkbox" class="character-select" data-id="{{ character.page_id }}" data-toggle-url="{{ url_for('character.toggle_selection', id=0) }}" {% if character.page_id in selected_ids %}checked{% endif %}></td>
+                    <td>
+                        <form method="post" action="{{ url_for('character.toggle_selection', id=character.page_id) }}">
+                            <input type="hidden" name="page" value="{{ page }}">
+                            <input type="hidden" name="search_name" value="{{ search_name }}">
+                            <input type="hidden" name="filter_id" value="{{ filter_id }}">
+                            <input type="hidden" name="filter_align" value="{{ filter_align }}">
+                            <input type="hidden" name="filter_eye" value="{{ filter_eye }}">
+                            <input type="hidden" name="filter_hair" value="{{ filter_hair }}">
+                            <input type="hidden" name="filter_sex" value="{{ filter_sex }}">
+                            <input type="hidden" name="filter_alive" value="{{ filter_alive }}">
+                            <input type="hidden" name="sort_appearances" value="{{ sort_appearances }}">
+                            <input type="checkbox" name="select" value="1" {% if character.page_id in selected_ids %}checked{% endif %}>
+                            <button type="submit">Compare</button>
+                        </form>
+                    </td>
                     <td><a href="{{ url_for('character.character_detail', id=character.page_id) }}">{{ character.name|default('Unknown') }}</a></td>
                     <td>{{ character.ID|default('N/A') }}</td>
                     <td>{{ character.ALIGN|default('Unknown') }}</td>
@@ -130,8 +146,4 @@
             <a href="{{ url_for('character.index', page=page+1, search_name=search_name, filter_id=filter_id, filter_align=filter_align, filter_eye=filter_eye, filter_hair=filter_hair, filter_sex=filter_sex, filter_alive=filter_alive, sort_appearances=sort_appearances) }}">Next</a>
         {% endif %}
     </div>
-{% endblock %}
-
-{% block extra_scripts %}
-    <script src="{{ url_for('static', filename='js/selection.js') }}"></script>
 {% endblock %}

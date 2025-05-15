@@ -19,7 +19,7 @@ def index():
     filter_hair = request.args.get('filter_hair', '')
     filter_sex = request.args.get('filter_sex', '')
     filter_alive = request.args.get('filter_alive', '')
-    sort_appearances = request.args.get('sort_appearances', 'asc')  # 只保留 APPEARANCES 排序
+    sort_appearances = request.args.get('sort_appearances', 'asc')
     
     selected_ids = session.get('selected_ids', [])
     
@@ -51,7 +51,7 @@ def index():
     # 加入 OtherInfo 表以访问 APPEARANCES
     query = query.join(OtherInfo, BasicInfo.page_id == OtherInfo.page_id)
     
-    # 按 APPEARANCES 排序（将字符串转换为整数）
+    # 按 APPEARANCES 排序
     sort_func_appearances = asc if sort_appearances == 'asc' else desc
     query = query.order_by(sort_func_appearances(
         func.cast(func.coalesce(OtherInfo.APPEARANCES, '0'), Integer)
@@ -166,13 +166,38 @@ def remove_from_compare(id):
     else:
         return redirect(url_for('character.index'))
 
+@character_bp.route('/clear_filters')
+def clear_filters():
+    # 清空筛选相关的会话数据（如果有）
+    # 直接重定向到根路径，移除所有查询参数
+    return redirect(url_for('character.index'))
+
 @character_bp.route('/toggle_selection/<int:id>', methods=['POST'])
 def toggle_selection(id):
+    # 获取当前筛选和分页状态
+    page = request.form.get('page', 1, type=int)
+    search_name = request.form.get('search_name', '')
+    filter_id = request.form.get('filter_id', '')
+    filter_align = request.form.get('filter_align', '')
+    filter_eye = request.form.get('filter_eye', '')
+    filter_hair = request.form.get('filter_hair', '')
+    filter_sex = request.form.get('filter_sex', '')
+    filter_alive = request.form.get('filter_alive', '')
+    sort_appearances = request.form.get('sort_appearances', 'asc')
+    
+    # 更新 selected_ids
     selected_ids = session.get('selected_ids', [])
-    if id in selected_ids:
-        selected_ids.remove(id)
-    else:
+    is_selected = request.form.get('select') == '1'
+    
+    if is_selected and id not in selected_ids:
         selected_ids.append(id)
+    elif not is_selected and id in selected_ids:
+        selected_ids.remove(id)
+    
     session['selected_ids'] = selected_ids
     session.modified = True
-    return jsonify({'status': 'success', 'selected': id in selected_ids})
+    
+    # 重定向回 index，保持筛选和分页状态
+    return redirect(url_for('character.index', page=page, search_name=search_name, filter_id=filter_id,
+                            filter_align=filter_align, filter_eye=filter_eye, filter_hair=filter_hair,
+                            filter_sex=filter_sex, filter_alive=filter_alive, sort_appearances=sort_appearances))
