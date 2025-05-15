@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Analysis{% endblock %}
+
+{% block content %}
+    <div class="analysis-section alignment-section">
+        <h2>Alignment Proportion</h2>
+        <div class="pie-chart" 
+             style="background: conic-gradient(
+                #007bff 0% {{ (alignment_counts['Good'] / total_chars * 100) if total_chars else 0 }}%,
+                #ff4444 {{ (alignment_counts['Good'] / total_chars * 100) if total_chars else 0 }}% {{ (alignment_counts['Good'] + alignment_counts['Bad']) / total_chars * 100 if total_chars else 0 }}%,
+                #ffd700 {{ (alignment_counts['Good'] + alignment_counts['Bad']) / total_chars * 100 if total_chars else 0 }}% 100%
+             );">
+        </div>
+        <table class="analysis-table">
+            <tr>
+                <th>Alignment</th>
+                <th>Count</th>
+                <th>Percentage</th>
+            </tr>
+            <tr>
+                <td>Good</td>
+                <td>{{ alignment_counts['Good'] }}</td>
+                <td>{{ (alignment_counts['Good'] / total_chars * 100)|round(2) }}%</td>
+            </tr>
+            <tr>
+                <td>Bad</td>
+                <td>{{ alignment_counts['Bad'] }}</td>
+                <td>{{ (alignment_counts['Bad'] / total_chars * 100)|round(2) }}%</td>
+            </tr>
+            <tr>
+                <td>Neutral</td>
+                <td>{{ alignment_counts['Neutral'] }}</td>
+                <td>{{ (alignment_counts['Neutral'] / total_chars * 100)|round(2) }}%</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="analysis-section gender-section">
+        <h2>Gender Distribution</h2>
+        <table class="analysis-table">
+            <tr>
+                <th>Gender</th>
+                <th>Count</th>
+            </tr>
+            <tr>
+                <td>Male Characters</td>
+                <td>{{ gender_counts['Male'] }}</td>
+            </tr>
+            <tr>
+                <td>Female Characters</td>
+                <td>{{ gender_counts['Female'] }}</td>
+            </tr>
+            <tr>
+                <td>Unknown/Genderless Characters</td>
+                <td>{{ gender_counts['Unknown'] }}</td>
+            </tr>
+        </table>
+    </div>
+{% endblock %}

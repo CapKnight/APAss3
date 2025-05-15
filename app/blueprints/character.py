@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from app.models import BasicInfo, Appearance, OtherInfo, UrlInfo
 from app.config import Config
 from sqlalchemy import distinct, asc, desc, func, cast, Integer
+from collections import defaultdict
 
 character_bp = Blueprint('character', __name__)
 
@@ -201,3 +202,33 @@ def toggle_selection(id):
     return redirect(url_for('character.index', page=page, search_name=search_name, filter_id=filter_id,
                             filter_align=filter_align, filter_eye=filter_eye, filter_hair=filter_hair,
                             filter_sex=filter_sex, filter_alive=filter_alive, sort_appearances=sort_appearances))
+
+@character_bp.route('/analysis')
+def analysis():
+    # 阵营比例
+    total_chars = BasicInfo.query.count()
+    alignment_counts = {
+        'Good': BasicInfo.query.filter(BasicInfo.ALIGN.ilike('%Good%')).count(),
+        'Bad': BasicInfo.query.filter(BasicInfo.ALIGN.ilike('%Bad%')).count(),
+        'Neutral': BasicInfo.query.filter(BasicInfo.ALIGN.ilike('%Neutral%')).count()
+    }
+    
+    # 性别统计（简化：仅统计 Male, Female, Unknown）
+    gender_counts = {
+        'Male': 0,
+        'Female': 0,
+        'Unknown': 0
+    }
+    for char in BasicInfo.query.all():
+        gender = char.SEX if char.SEX else 'Unknown'
+        if gender == 'Unknown' or gender == 'Genderless Characters':
+            gender_counts['Unknown'] += 1
+        elif 'Male' in gender:
+            gender_counts['Male'] += 1
+        elif 'Female' in gender:
+            gender_counts['Female'] += 1
+    
+    return render_template('analysis.html', 
+                          total_chars=total_chars, 
+                          alignment_counts=alignment_counts, 
+                          gender_counts=gender_counts)

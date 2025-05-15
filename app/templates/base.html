@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}DC Characters{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    {% block extra_head %}{% endblock %}
 </head>
 <body>
     <nav>
@@ -16,19 +15,16 @@
             <div class="nav-links">
                 <a href="{{ url_for('character.index') }}">Home</a>
                 <a href="{{ url_for('character.compare') }}">Compare</a>
+                <a href="{{ url_for('character.analysis') }}">Analysis</a>
             </div>
         </div>
     </nav>
-
     <main>
-        {% block content %}
-        {% endblock %}
+        {% block content %}{% endblock %}
     </main>
-
     <footer>
-        <p>© 2025 DC Characters App. All rights reserved.</p>
-        <p>Contact us at: <a href="mailto:support@dccharacters.com">support@dccharacters.com</a></p>
+        <p>&copy; 2025 DC Characters. All rights reserved.</p>
+        <p><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
     </footer>
-
 </body>
 </html>
