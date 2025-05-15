@@ -10,6 +10,20 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+
+    background-image: url('/static/background.jpg');
+    background-size: cover; /* 图片覆盖整个背景 */
+    background-position: center; /* 图片居中 */
+    background-repeat: no-repeat; /* 不重复 */
+    background-attachment: fixed; /* 背景固定，滚动时不移动 */
+    min-height: 100vh; /* 确保背景覆盖整个页面高度 */
+    margin: 0; /* 移除默认边距 */
+}
+
+.content {
+    background-color: rgba(255, 255, 255, 0.8); /* 半透明白色背景 */
+    padding: 20px;
+    border-radius: 10px;
 }
 
 /* Navigation Bar */
@@ -52,10 +66,12 @@ nav {
 
 /* Main Content */
 main {
-    flex: 1;
+    background-color: rgba(255, 255, 255, 0.9); /* 半透明白色背景 */
+    padding: 20px;
     max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 1rem;
+    margin: 20px auto; /* 居中并留边距 */
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* 轻微阴影 */
 }
 
 /* Footer */
