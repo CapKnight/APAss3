@@ -10,6 +10,10 @@ class BasicInfo(db.Model):
     ALIVE = db.Column(db.String(50))
     YEAR = db.Column(db.String(10))
 
+    appearance = db.relationship('Appearance', backref='basic_info', uselist=False)
+    other_info = db.relationship('OtherInfo', backref='basic_info', uselist=False)
+    url_info = db.relationship('UrlInfo', backref='basic_info', uselist=False)
+
 class Appearance(db.Model):
     __tablename__ = 'appearance'
     id = db.Column(db.Integer, primary_key=True)
