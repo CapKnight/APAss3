@@ -1,0 +1,77 @@
+* f5a09c0 : refactor the code for submitting
+*   43ccfd2 : Merge pull request #13 from CapKnight/deployment
+|\  
+| * f84d2aa : modify for deploy
+| * eb28e83 : modify for deploy
+| * b02afd8 : modify for deploy
+| * 27d7a1d : modify for deploy
+| * 8bf1253 : modify for deploy
+| * d36c188 : modify for deploy
+| * 6a378a7 : modify for deploy
+| * 680c27a : modify for deploy
+| * 6c7a199 : modify for deploy
+| * 842c462 : modify for deploy
+| * 4331419 : modify for deploy
+| * f8d6a56 : modify for deploy
+* |   3bea36d : Merge pull request #12 from CapKnight/deployment
+|\ \  
+| |/  
+| * c91b719 : modify for deploy
+* |   ffe130e : Merge pull request #11 from CapKnight/deployment
+|\ \  
+| |/  
+| * 3e5e12a : modify for deploy
+* |   b9fced4 : Merge pull request #10 from CapKnight/deployment
+|\ \  
+| |/  
+| * d8de692 : modify for deploy
+* |   d89a007 : Merge pull request #9 from CapKnight/deployment
+|\ \  
+| |/  
+| * 6e2d7e8 : modify for deploy
+* |   89f5e79 : Merge pull request #8 from CapKnight/deployment
+|\ \  
+| |/  
+| * 3c1194e : modify for deploy
+* |   c5eb764 : Merge pull request #7 from CapKnight/deployment
+|\ \  
+| |/  
+| * 7bfb3cd : modify for deploy
+* |   e4b720f : Merge pull request #6 from CapKnight/deployment
+|\ \  
+| |/  
+| * 04d1b9a : modify for deploy
+| * bf5539c : modify for deploy
+* |   147b255 : Merge pull request #5 from CapKnight/deployment
+|\ \  
+| |/  
+| * cdb242f : set for deployment
+|/  
+* e82214b : background pic
+*   bbad231 : Merge pull request #4 from CapKnight/test
+|\  
+| * 1f9e021 : make the test pass
+|/  
+* 959dd8e : refactor the code using create_app()
+* 0184e7d : refactor: connect models with relationship
+* 3153933 : fix bug: Clear Filter not working
+* b3f69d4 : new feature: analysis
+* af6f188 : refactor: delete all js code because the assessment is not allowed to use js
+* 88cfa77 : new feature: sort the list in order
+* 47e984d : add error handling:404 500
+* ef7cb7c : new feature: search and filter
+* 4933d4c : fix bug in compare.html
+*   c470678 : Merge pull request #3 from CapKnight/33
+|\  
+| * 0332419 : refactor the code for models.py and SQLite
+|/  
+*   278c038 : Merge pull request #2 from CapKnight/22
+|\  
+| * 87f97a7 : new feature and html:compare different characters
+* |   54ceb6a : Merge pull request #1 from CapKnight/11
+|\ \  
+| |/  
+| * f70d90a : refactor the code so that there are four linked tables now
+|/  
+* 2c1bf4f : refactor the code to achieve modular development. add pager(paginate).
+* 84a63cf : Initial push
