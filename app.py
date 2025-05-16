@@ -1,4 +1,5 @@
-from run import create_app
+import os
+  from app import create_app  # 从 app 包中导入 create_app
 
   app = create_app()
 
