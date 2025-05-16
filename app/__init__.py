@@ -5,14 +5,13 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 def create_app():
-    app = Flask(__name__, static_folder="static", template_folder="templates")
+    app = Flask(__name__, static_folder="../static", template_folder="templates")  # 调整为根目录的 static
     app.secret_key = os.getenv("SECRET_KEY", "your_secret_key")
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", "sqlite:///characters.db")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
 
-    # 延迟导入模型
     from app.models import BasicInfo, Appearance, OtherInfo, UrlInfo
     from app.blueprints.character import character_bp
 
