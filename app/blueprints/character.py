@@ -22,16 +22,14 @@ def index():
     sort_appearances = request.args.get('sort_appearances', 'asc')
     
     selected_ids = session.get('selected_ids', [])
-    
-    # 获取筛选字段的唯一值
+
     id_values = [id[0] for id in BasicInfo.query.with_entities(distinct(BasicInfo.ID)).all() if id[0] and id[0] != 'N/A']
     align_values = [align[0] for align in BasicInfo.query.with_entities(distinct(BasicInfo.ALIGN)).all() if align[0] and align[0] != 'Unknown']
     eye_values = [eye[0] for eye in Appearance.query.with_entities(distinct(Appearance.EYE)).all() if eye[0] and eye[0] != 'Unknown']
     hair_values = [hair[0] for hair in Appearance.query.with_entities(distinct(Appearance.HAIR)).all() if hair[0] and hair[0] != 'Unknown']
     sex_values = [sex[0] for sex in BasicInfo.query.with_entities(distinct(BasicInfo.SEX)).all() if sex[0] and sex[0] != 'Unknown']
     alive_values = [alive[0] for alive in BasicInfo.query.with_entities(distinct(BasicInfo.ALIVE)).all() if alive[0] and alive[0] != 'Unknown']
-    
-    # 构建查询
+
     query = BasicInfo.query
     if search_name:
         query = query.filter(BasicInfo.name.ilike(f'%{search_name}%'))
@@ -47,17 +45,14 @@ def index():
         query = query.filter(BasicInfo.SEX == filter_sex)
     if filter_alive and filter_alive != 'All':
         query = query.filter(BasicInfo.ALIVE == filter_alive)
-    
-    # 加入 OtherInfo 表以访问 APPEARANCES
+
     query = query.join(OtherInfo, BasicInfo.page_id == OtherInfo.page_id)
-    
-    # 按 APPEARANCES 排序
+
     sort_func_appearances = asc if sort_appearances == 'asc' else desc
     query = query.order_by(sort_func_appearances(
         func.cast(func.coalesce(OtherInfo.APPEARANCES, '0'), Integer)
     ))
-    
-    # 应用分页
+
     total_count = query.count()
     basic_query = query.offset(start).limit(per_page).all()
     total_pages = (total_count + per_page - 1) // per_page
@@ -181,7 +176,6 @@ def clear_filters():
 
 @character_bp.route('/toggle_selection/<int:id>', methods=['POST'])
 def toggle_selection(id):
-    # 获取当前筛选和分页状态
     page = request.form.get('page', 1, type=int)
     search_name = request.form.get('search_name', '')
     filter_id = request.form.get('filter_id', '')
@@ -191,8 +185,7 @@ def toggle_selection(id):
     filter_sex = request.form.get('filter_sex', '')
     filter_alive = request.form.get('filter_alive', '')
     sort_appearances = request.form.get('sort_appearances', 'asc')
-    
-    # 更新 selected_ids
+
     selected_ids = session.get('selected_ids', [])
     is_selected = request.form.get('select') == '1'
     
@@ -203,23 +196,20 @@ def toggle_selection(id):
     
     session['selected_ids'] = selected_ids
     session.modified = True
-    
-    # 重定向回 index，保持筛选和分页状态
+
     return redirect(url_for('character.index', page=page, search_name=search_name, filter_id=filter_id,
                             filter_align=filter_align, filter_eye=filter_eye, filter_hair=filter_hair,
                             filter_sex=filter_sex, filter_alive=filter_alive, sort_appearances=sort_appearances))
 
 @character_bp.route('/analysis')
 def analysis():
-    # 阵营比例
     total_chars = BasicInfo.query.count()
     alignment_counts = {
         'Good': BasicInfo.query.filter(BasicInfo.ALIGN.ilike('%Good%')).count(),
         'Bad': BasicInfo.query.filter(BasicInfo.ALIGN.ilike('%Bad%')).count(),
         'Neutral': BasicInfo.query.filter(BasicInfo.ALIGN.ilike('%Neutral%')).count()
     }
-    
-    # 性别统计（简化：仅统计 Male, Female, Unknown）
+
     gender_counts = {
         'Male': 0,
         'Female': 0,

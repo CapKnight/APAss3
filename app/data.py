@@ -5,7 +5,6 @@ from app.models import BasicInfo, Appearance, OtherInfo, UrlInfo
 
 def migrate_data_to_db():
     try:
-        # 获取CSV文件路径（兼容Render环境）
         base_dir = os.path.abspath(os.path.dirname(__file__))
         data_path = os.path.join(base_dir, '..', 'dc_data.csv')
         
@@ -13,15 +12,13 @@ def migrate_data_to_db():
             raise FileNotFoundError(f"CSV文件未找到: {data_path}")
 
         df = pd.read_csv(data_path)
-        df = df.fillna('Unknown')  # 简化处理
+        df = df.fillna('Unknown')
 
-        # 清空现有数据（可选）
         db.session.query(UrlInfo).delete()
         db.session.query(OtherInfo).delete()
         db.session.query(Appearance).delete()
         db.session.query(BasicInfo).delete()
 
-        # 批量插入
         for _, row in df.iterrows():
             try:
                 page_id = int(row['page_id']) if str(row['page_id']).isdigit() else None
@@ -39,9 +36,8 @@ def migrate_data_to_db():
                 )
                 
                 db.session.add(basic)
-                db.session.flush()  # 获取page_id
+                db.session.flush()
 
-                # 关联表数据
                 db.session.add_all([
                     Appearance(
                         page_id=page_id,
@@ -66,9 +62,9 @@ def migrate_data_to_db():
                 continue
 
         db.session.commit()
-        print(f"成功导入 {db.session.query(BasicInfo).count()} 条记录")
+        print(f"Successfully import {db.session.query(BasicInfo).count()}")
 
     except Exception as e:
         db.session.rollback()
-        print(f"导入失败: {str(e)}")
+        print(f"Import Failed: {str(e)}")
         raise

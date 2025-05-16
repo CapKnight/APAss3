@@ -5,9 +5,7 @@ from app.models import BasicInfo, Appearance, OtherInfo, UrlInfo
 def init_sample_data():
     app = create_app()
     with app.app_context():
-        # 检查是否已有数据
         if BasicInfo.query.count() == 0:
-            # 创建示例数据
             basic = BasicInfo(
                 page_id=1,
                 name="Test Character",

@@ -5,28 +5,21 @@ from app.blueprints.character import character_bp
 
 class TestDCCharacters(unittest.TestCase):
     def setUp(self):
-        """设置测试环境，创建测试应用和数据库"""
         self.app = create_app()
-        self.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'  # 使用内存数据库
+        self.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:' 
         self.app.config['TESTING'] = True
-        # 移除重复注册，因为 create_app() 已注册蓝图
-        # self.app.register_blueprint(character_bp, url_prefix='/')
         self.client = self.app.test_client()
 
-        # 创建表
         with self.app.app_context():
             db.create_all()
-            # 插入测试数据
             self._insert_test_data()
 
     def tearDown(self):
-        """清理测试环境"""
         with self.app.app_context():
             db.session.remove()
             db.drop_all()
 
     def _insert_test_data(self):
-        """插入测试数据到数据库"""
         with self.app.app_context():
             basic1 = BasicInfo(page_id=1, name="Superman", ALIGN="Good", SEX="Male", ALIVE="Living", YEAR="1938")
             basic2 = BasicInfo(page_id=2, name="Batman", ALIGN="Good", SEX="Male", ALIVE="Living", YEAR="1939")
@@ -47,37 +40,30 @@ class TestDCCharacters(unittest.TestCase):
             db.session.commit()
 
     def test_index_route(self):
-        """测试 index 路由和筛选功能"""
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Superman', response.data)
         self.assertIn(b'Batman', response.data)
 
-        # 测试筛选
         response = self.client.get('/?search_name=Superman')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Superman', response.data)
         self.assertNotIn(b'Batman', response.data)
 
     def test_character_detail_route(self):
-        """测试 character_detail 路由"""
         response = self.client.get('/character/1')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Superman', response.data)
         self.assertIn(b'1938', response.data)
 
-        # 测试 404
         response = self.client.get('/character/999')
         self.assertEqual(response.status_code, 404)
 
     def test_compare_route(self):
-        """测试 compare 路由"""
-        # 无选择角色
         response = self.client.get('/compare')
         self.assertEqual(response.status_code, 400)
         self.assertIn(b'No characters selected', response.data)
 
-        # 选择角色
         with self.client.session_transaction() as sess:
             sess['selected_ids'] = [1]
         response = self.client.get('/compare')
@@ -85,28 +71,23 @@ class TestDCCharacters(unittest.TestCase):
         self.assertIn(b'Superman', response.data)
 
     def test_clear_filters_route(self):
-        """测试 clear_filters 路由"""
-        # 应用筛选
         response = self.client.get('/?search_name=Superman')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Superman', response.data)
         self.assertNotIn(b'Batman', response.data)
 
-        # 清除筛选，跟随重定向
         response = self.client.get('/clear_filters', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Superman', response.data)
         self.assertIn(b'Batman', response.data)
 
     def test_analysis_route(self):
-        """测试 analysis 路由"""
         response = self.client.get('/analysis')
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Good', response.data)  # 阵营比例
-        self.assertIn(b'Male', response.data)  # 性别分布
+        self.assertIn(b'Good', response.data)
+        self.assertIn(b'Male', response.data)
 
     def test_database_records(self):
-        """测试数据库记录和关系"""
         with self.app.app_context():
             basics = BasicInfo.query.all()
             self.assertEqual(len(basics), 2)
