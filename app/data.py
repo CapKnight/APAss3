@@ -36,6 +36,7 @@ def migrate_data_to_db():
                     SEX=row.get('SEX', ''),
                     ALIVE=row.get('ALIVE', ''),
                     YEAR=str(row.get('YEAR', ''))
+                )
                 
                 db.session.add(basic)
                 db.session.flush()  # 获取page_id
