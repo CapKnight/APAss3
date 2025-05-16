@@ -1,36 +1,49 @@
 import os
 from app import create_app, db
 from app.models import BasicInfo, Appearance, OtherInfo, UrlInfo
-from sqlalchemy import create_engine
-import pandas as pd
 
-def migrate_from_sqlite():
+def init_sample_data():
     app = create_app()
     with app.app_context():
-        # 从SQLite提取数据
-        sqlite_engine = create_engine('sqlite:///characters.db')
-        
-        tables = {
-            'basic_info': BasicInfo,
-            'appearance': Appearance,
-            'other_info': OtherInfo,
-            'url_info': UrlInfo
-        }
-
-        for table_name, model in tables.items():
-            # 使用pandas读取SQLite数据
-            df = pd.read_sql_table(table_name, sqlite_engine)
+        # 检查是否已有数据
+        if BasicInfo.query.count() == 0:
+            # 创建示例数据
+            basic = BasicInfo(
+                page_id=1,
+                name="Test Character",
+                ID="TEST001",
+                ALIGN="Good",
+                SEX="Male",
+                ALIVE="Living",
+                YEAR="2023"
+            )
+            db.session.add(basic)
             
-            # 写入PostgreSQL
-            if not df.empty:
-                df.to_sql(
-                    table_name,
-                    db.engine,
-                    if_exists='append',
-                    index=False,
-                    method='multi'
-                )
-                print(f"Migrated {len(df)} rows to {table_name}")
+            appearance = Appearance(
+                page_id=1,
+                EYE="Blue",
+                HAIR="Brown"
+            )
+            db.session.add(appearance)
+            
+            other = OtherInfo(
+                page_id=1,
+                GSM="Heterosexual",
+                APPEARANCES="10",
+                FIRST_APPEARANCE="Issue #1"
+            )
+            db.session.add(other)
+            
+            url = UrlInfo(
+                page_id=1,
+                urlslug="/character/test"
+            )
+            db.session.add(url)
+            
+            db.session.commit()
+            print("Sample data initialized")
+        else:
+            print("Data already exists")
 
 if __name__ == '__main__':
-    migrate_from_sqlite()
+    init_sample_data()
